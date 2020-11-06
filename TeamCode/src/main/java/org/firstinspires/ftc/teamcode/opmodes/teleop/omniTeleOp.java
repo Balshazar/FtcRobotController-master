@@ -82,8 +82,8 @@ public class omniTeleOp extends LinearOpMode {
 
 
 
-            leftBack.setPower(gamepad1.left_stick_y);
-            rightBack.setPower(-gamepad1.right_stick_y);
+            leftBack.setPower(-gamepad1.left_stick_y);
+            rightBack.setPower(gamepad1.right_stick_y);
 
             
             // Show the elapsed game time and wheel power.
