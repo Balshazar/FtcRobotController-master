@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+@TeleOp(name = "Basic Iterative Op", group = "Iterative Op")
+@Disabled
 public class EpicTeleOp extends OpMode {
 
     DcMotor lf;
@@ -13,10 +17,10 @@ public class EpicTeleOp extends OpMode {
 
     @Override
     public void init() {
-        lf = hardwareMap.dcMotor.get("lf");
-        lr = hardwareMap.dcMotor.get("lr");
-        rf = hardwareMap.dcMotor.get("rf");
-        rr = hardwareMap.dcMotor.get("rr");
+        lf = hardwareMap.dcMotor.get("left front");
+        lr = hardwareMap.dcMotor.get("left back");
+        rf = hardwareMap.dcMotor.get("right front");
+        rr = hardwareMap.dcMotor.get("right back");
 
         rf.setDirection(DcMotorSimple.Direction.REVERSE);
         rr.setDirection(DcMotorSimple.Direction.REVERSE);
