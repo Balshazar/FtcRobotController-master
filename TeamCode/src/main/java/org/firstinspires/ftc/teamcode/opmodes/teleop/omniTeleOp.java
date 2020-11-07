@@ -30,9 +30,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -66,6 +64,8 @@ public class omniTeleOp extends LinearOpMode {
     private DcMotor rightBack = null;
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
+    private int loopyleft = 0;
+    private int loopyright = 0;
 
     @Override
     public void runOpMode() {
@@ -78,17 +78,87 @@ public class omniTeleOp extends LinearOpMode {
         
         waitForStart();
         runtime.reset();
+
         while (opModeIsActive()) {
 
 
+            double leftPower;
+            double rightPower;
+            double drive = -gamepad1.right_stick_x;
+            double turn  =  gamepad1.left_stick_y;
+            leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+            rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
-            leftBack.setPower(-gamepad1.left_stick_y);
-            rightBack.setPower(gamepad1.right_stick_y);
+            // Tank Mode uses one stick to control each wheel.
+            // - This requires no math, but it is hard to drive forward slowly and keep straight.
+            // leftPower  = -gamepad1.left_stick_y ;
+            // rightPower = -gamepad1.right_stick_y ;
 
-            
+            // Send calculated power to wheels
+            leftBack.setPower(leftPower);
+            rightBack.setPower(rightPower);
+            if (loopyleft > 0 && loopyleft <= 20) {
+                rightBack.setPower(0.56);
+            }
+            if (loopyleft > 20 && loopyleft <= 40) {
+                leftBack.setPower(-0.6);
+            }
+            if (loopyleft > 40 && loopyleft <= 60) {
+                leftBack.setPower(0.35);
+                rightBack.setPower(-0.35);
+            }
+
+            if (gamepad1.dpad_left == true) {
+                loopyright = 0;
+                loopyleft += 1;
+                if (loopyleft > 60) {
+                    loopyleft = 1;
+                }
+            }
+            else {
+                if (loopyleft >= 1) {
+                    loopyleft += 1;
+                }
+                if (loopyleft >= 60) {
+                    loopyleft = 0;
+                    rightBack.setPower(0);
+                    leftBack.setPower(0);
+                }
+            }
+            if (loopyright > 0 && loopyright <= 20) {
+                leftBack.setPower(-0.56);
+            }
+            if (loopyright > 20 && loopyright <= 40) {
+                rightBack.setPower(0.6);
+            }
+            if (loopyright > 40 && loopyright <= 60) {
+                leftBack.setPower(0.35);
+                rightBack.setPower(-0.35);
+            }
+
+            if (gamepad1.dpad_right == true) {
+                loopyleft = 0;
+                loopyright += 1;
+                if (loopyright > 60) {
+                    loopyright = 1;
+                }
+            }
+            else {
+                if (loopyright >= 1) {
+                    loopyright += 1;
+                }
+                if (loopyright >= 60) {
+                    loopyright = 0;
+                    rightBack.setPower(0);
+                    leftBack.setPower(0);
+                }
+            }
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            
+            telemetry.addData("Motors", "Dpad" + gamepad1.dpad_left, "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.update();
+
         }
     }
 }
