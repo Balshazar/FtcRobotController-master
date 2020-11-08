@@ -59,33 +59,47 @@ _________________________________
 public class omniTeleOp extends LinearOpMode {
 
     // Declare OpMode members.
+    //Elapsed time variable
     private ElapsedTime runtime = new ElapsedTime();
+    //Rear left motor
     private DcMotor leftBack = null;
+    //Rear right motor
     private DcMotor rightBack = null;
+    //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
+    //Loopy left for "shafeing" left
     private int loopyleft = 0;
+    //Loopy right for "shafeing" right
     private int loopyright = 0;
 
     @Override
     public void runOpMode() {
+
+        //Print stuff to Driver Station phone
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         leftBack  = hardwareMap.get(DcMotor.class, "Left Back");
         rightBack = hardwareMap.get(DcMotor.class, "Right Back");
+        //Set the right back motor to reverse
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
-        
+        //Wait for start
         waitForStart();
+        //Reset elapsed time
         runtime.reset();
 
         while (opModeIsActive()) {
 
-
+            //power to rear back motor
             double leftPower;
+            //Power to rear back motor
             double rightPower;
+            //Forward force
             double drive = -gamepad1.right_stick_x;
+            //Turning Froce
             double turn  =  gamepad1.left_stick_y;
+            //Convert turning and forward force into one that is then set to left power and right power
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
@@ -97,24 +111,31 @@ public class omniTeleOp extends LinearOpMode {
             // Send calculated power to wheels
             leftBack.setPower(leftPower);
             rightBack.setPower(rightPower);
+            //For "shafeing". Phase 1: right motor forward
             if (loopyleft > 0 && loopyleft <= 20) {
                 rightBack.setPower(0.56);
             }
+            //Phase 2: left motor forward
             if (loopyleft > 20 && loopyleft <= 40) {
                 leftBack.setPower(-0.6);
             }
+            //Phase 3: both back
             if (loopyleft > 40 && loopyleft <= 60) {
                 leftBack.setPower(0.35);
                 rightBack.setPower(-0.35);
             }
-
+            //If the left button of the dpad is pressed:
             if (gamepad1.dpad_left == true) {
+                //Phases of "shafeing" right set to 0
                 loopyright = 0;
+                //Phases of "shafeing" left add 1 each time
                 loopyleft += 1;
+                //If phases are greater that 60 phases set to 1
                 if (loopyleft > 60) {
                     loopyleft = 1;
                 }
             }
+            //If the left button of the dpad isn't pressed:
             else {
                 if (loopyleft >= 1) {
                     loopyleft += 1;
