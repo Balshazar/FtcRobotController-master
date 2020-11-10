@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-@TeleOp(name="Omni TeleOp", group="Controller")
+@TeleOp(name="Omni TeleOp(With \"Shafeing\")", group="Controller")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
@@ -56,7 +56,7 @@ _________________________________
  [____]/  \____\/  /__/_/    \__\_\    [_________[/         [______[/          /__/_/    \__\_\   is the best  (_)
 
  */
-public class omniTeleOp extends LinearOpMode {
+public class omniTeleOp_shafe extends LinearOpMode {
 
     // Declare OpMode members.
     //Elapsed time variable
@@ -68,7 +68,10 @@ public class omniTeleOp extends LinearOpMode {
     //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
-
+    //Loopy left for "shafeing" left
+    private int loopyleft = 0;
+    //Loopy right for "shafeing" right
+    private int loopyright = 0;
 
     @Override
     public void runOpMode() {
@@ -108,6 +111,69 @@ public class omniTeleOp extends LinearOpMode {
             // Send calculated power to wheels
             leftBack.setPower(leftPower);
             rightBack.setPower(rightPower);
+            //For "shafeing". Phase 1: right motor forward
+            if (loopyleft > 0 && loopyleft <= 20) {
+                rightBack.setPower(0.56);
+            }
+            //Phase 2: left motor forward
+            if (loopyleft > 20 && loopyleft <= 40) {
+                leftBack.setPower(-0.6);
+            }
+            //Phase 3: both back
+            if (loopyleft > 40 && loopyleft <= 60) {
+                leftBack.setPower(0.35);
+                rightBack.setPower(-0.35);
+            }
+            //If the left button of the dpad is pressed:
+            if (gamepad1.dpad_left == true) {
+                //Phases of "shafeing" right set to 0
+                loopyright = 0;
+                //Phases of "shafeing" left add 1 each time
+                loopyleft += 1;
+                //If phases are greater that 60 phases set to 1
+                if (loopyleft > 60) {
+                    loopyleft = 1;
+                }
+            }
+            //If the left button of the dpad isn't pressed:
+            else {
+                if (loopyleft >= 1) {
+                    loopyleft += 1;
+                }
+                if (loopyleft >= 60) {
+                    loopyleft = 0;
+                    rightBack.setPower(0);
+                    leftBack.setPower(0);
+                }
+            }
+            if (loopyright > 0 && loopyright <= 20) {
+                leftBack.setPower(-0.56);
+            }
+            if (loopyright > 20 && loopyright <= 40) {
+                rightBack.setPower(0.6);
+            }
+            if (loopyright > 40 && loopyright <= 60) {
+                leftBack.setPower(0.35);
+                rightBack.setPower(-0.35);
+            }
+
+            if (gamepad1.dpad_right == true) {
+                loopyleft = 0;
+                loopyright += 1;
+                if (loopyright > 60) {
+                    loopyright = 1;
+                }
+            }
+            else {
+                if (loopyright >= 1) {
+                    loopyright += 1;
+                }
+                if (loopyright >= 60) {
+                    loopyright = 0;
+                    rightBack.setPower(0);
+                    leftBack.setPower(0);
+                }
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
