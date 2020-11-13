@@ -65,10 +65,14 @@ public class omniTeleOp extends LinearOpMode {
     private DcMotor leftBack = null;
     //Rear right motor
     private DcMotor rightBack = null;
+    //Intake Left
+    private DcMotor left_intake = null;
+    //Intake Right
+    private DcMotor right_intake = null;
     //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
-
+    private int intake_num = 0;
 
     @Override
     public void runOpMode() {
@@ -80,6 +84,12 @@ public class omniTeleOp extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "Right Back");
         //Set the right back motor to reverse
         rightBack.setDirection(DcMotor.Direction.REVERSE);
+
+        left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
+        right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
+        //Right motor reversed
+        right_intake.setDirection(DcMotor.Direction.REVERSE);
+
 
         //Wait for start
         waitForStart();
@@ -108,6 +118,25 @@ public class omniTeleOp extends LinearOpMode {
             // Send calculated power to wheels
             leftBack.setPower(leftPower);
             rightBack.setPower(rightPower);
+            //For intake. Press A to turn both intake motors on and intake a ring
+            if (gamepad1.a == true) {
+                intake_num += 1;
+            }
+            if (intake_num == 0) {
+                left_intake.setPower(0);
+                right_intake.setPower(0);
+            }
+            if (intake_num > 0) {
+                if (intake_num < 1000) {
+                    intake_num = 0;
+                }
+
+                intake_num += 1;
+                left_intake.setPower(1);
+                right_intake.setPower(1);
+
+
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
