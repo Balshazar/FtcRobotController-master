@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-@TeleOp(name="Omni TeleOp", group="Controller")
+@TeleOp(name="Omni TeleOp(With \"Shafeing\")", group="Controller")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
@@ -56,7 +56,7 @@ _________________________________
  [____]/  \____\/  /__/_/    \__\_\    [_________[/         [______[/          /__/_/    \__\_\   is the best  (_)
 
  */
-public class omniTeleOp extends LinearOpMode {
+public class masterTeleOp_shafe extends LinearOpMode {
 
     // Declare OpMode members.
     //Elapsed time variable
@@ -65,14 +65,13 @@ public class omniTeleOp extends LinearOpMode {
     private DcMotor leftBack = null;
     //Rear right motor
     private DcMotor rightBack = null;
-    //Intake Left
-    private DcMotor left_intake = null;
-    //Intake Right
-    private DcMotor right_intake = null;
     //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
-    private int intake_num = 0;
+    //Loopy left for "shafeing" left
+    private int loopyleft = 0;
+    //Loopy right for "shafeing" right
+    private int loopyright = 0;
 
     @Override
     public void runOpMode() {
@@ -84,12 +83,6 @@ public class omniTeleOp extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "Right Back");
         //Set the right back motor to reverse
         rightBack.setDirection(DcMotor.Direction.REVERSE);
-
-        left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
-        right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
-        //Right motor reversed
-        right_intake.setDirection(DcMotor.Direction.REVERSE);
-
 
         //Wait for start
         waitForStart();
@@ -118,24 +111,68 @@ public class omniTeleOp extends LinearOpMode {
             // Send calculated power to wheels
             leftBack.setPower(leftPower);
             rightBack.setPower(rightPower);
-            //For intake. Press A to turn both intake motors on and intake a ring
-            if (gamepad1.a == true) {
-                intake_num += 1;
+            //For "shafeing". Phase 1: right motor forward
+            if (loopyleft > 0 && loopyleft <= 20) {
+                rightBack.setPower(0.56);
             }
-            if (intake_num == 0) {
-                left_intake.setPower(0);
-                right_intake.setPower(0);
+            //Phase 2: left motor forward
+            if (loopyleft > 20 && loopyleft <= 40) {
+                leftBack.setPower(-0.6);
             }
-            if (intake_num > 0) {
-                if (intake_num < 1000) {
-                    intake_num = 0;
+            //Phase 3: both back
+            if (loopyleft > 40 && loopyleft <= 60) {
+                leftBack.setPower(0.35);
+                rightBack.setPower(-0.35);
+            }
+            //If the left button of the dpad is pressed:
+            if (gamepad1.dpad_left == true) {
+                //Phases of "shafeing" right set to 0
+                loopyright = 0;
+                //Phases of "shafeing" left add 1 each time
+                loopyleft += 1;
+                //If phases are greater that 60 phases set to 1
+                if (loopyleft > 60) {
+                    loopyleft = 1;
                 }
+            }
+            //If the left button of the dpad isn't pressed:
+            else {
+                if (loopyleft >= 1) {
+                    loopyleft += 1;
+                }
+                if (loopyleft >= 60) {
+                    loopyleft = 0;
+                    rightBack.setPower(0);
+                    leftBack.setPower(0);
+                }
+            }
+            if (loopyright > 0 && loopyright <= 20) {
+                leftBack.setPower(-0.56);
+            }
+            if (loopyright > 20 && loopyright <= 40) {
+                rightBack.setPower(0.6);
+            }
+            if (loopyright > 40 && loopyright <= 60) {
+                leftBack.setPower(0.35);
+                rightBack.setPower(-0.35);
+            }
 
-                intake_num += 1;
-                left_intake.setPower(1);
-                right_intake.setPower(1);
-
-
+            if (gamepad1.dpad_right == true) {
+                loopyleft = 0;
+                loopyright += 1;
+                if (loopyright > 60) {
+                    loopyright = 1;
+                }
+            }
+            else {
+                if (loopyright >= 1) {
+                    loopyright += 1;
+                }
+                if (loopyright >= 60) {
+                    loopyright = 0;
+                    rightBack.setPower(0);
+                    leftBack.setPower(0);
+                }
             }
 
             // Show the elapsed game time and wheel power.
