@@ -31,7 +31,9 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="Omni TeleOp", group="Controller")
@@ -72,6 +74,8 @@ public class masterTeleOp extends LinearOpMode {
     //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
+    private CRServo servoone = null;
+    private CRServo servotwo = null;
     private int intake_num = 0;
 
     @Override
@@ -89,6 +93,8 @@ public class masterTeleOp extends LinearOpMode {
         right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
         //Right motor reversed
         right_intake.setDirection(DcMotor.Direction.REVERSE);
+        servoone = hardwareMap.crservo.get("servoone");
+        servotwo = hardwareMap.crservo.get("servotwo");
 
 
         //Wait for start
@@ -105,7 +111,10 @@ public class masterTeleOp extends LinearOpMode {
             //Forward force
             double drive = -gamepad1.right_stick_x;
             //Turning Froce
+
             double turn  =  gamepad1.left_stick_y;
+
+
             //Convert turning and forward force into one that is then set to left power and right power
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
@@ -119,28 +128,40 @@ public class masterTeleOp extends LinearOpMode {
             leftBack.setPower(leftPower);
             rightBack.setPower(rightPower);
             //For intake. Press A to turn both intake motors on and intake a ring
-            if (gamepad1.a == true) {
-                intake_num += 1;
+            if (gamepad1.right_trigger == 1) {
+                right_intake.setPower(-0.60);
+
             }
-            if (intake_num == 0) {
-                left_intake.setPower(0);
+            else {
                 right_intake.setPower(0);
-            }
-            if (intake_num > 0) {
-                if (intake_num < 1000) {
-                    intake_num = 0;
-                }
-
-                intake_num += 1;
-                left_intake.setPower(1);
-                right_intake.setPower(1);
-
 
             }
+
+            if (gamepad1.left_trigger >= 0.0) {
+                left_intake.setPower(20);
+                servoone.setPower(0.75);
+
+            }
+            else {
+                left_intake.setPower(0);
+
+            }
+            if (gamepad1.a == true) {
+
+                servoone.setPower(0.75);
+
+            }
+
+
+
+
+
+
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "Dpad" + gamepad1.dpad_left, "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Motors", "Dpad", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
 
         }
