@@ -134,7 +134,7 @@ public class masterTeleOp extends LinearOpMode {
             rightBack.setPower(rightPower);
 
             if (gamepad1.right_trigger == 1) {
-                right_intake.setPower(-0.60);
+                right_intake.setPower(-1);
 
             }
             else {
