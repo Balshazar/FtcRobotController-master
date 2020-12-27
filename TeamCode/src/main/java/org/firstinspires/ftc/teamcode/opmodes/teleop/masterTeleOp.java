@@ -35,7 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-@TeleOp(name="Omni TeleOp(test)", group="Controller")
+@TeleOp(name="Omni TeleOp", group="Controller")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
