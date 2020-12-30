@@ -150,7 +150,7 @@ public class Final extends LinearOpMode
         //Wait for start
         waitForStart();
         leftBack.setTargetPosition(-500);
-        rightBack.setTargetPosition(-500);
+        rightBack.setTargetPosition(500);
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
