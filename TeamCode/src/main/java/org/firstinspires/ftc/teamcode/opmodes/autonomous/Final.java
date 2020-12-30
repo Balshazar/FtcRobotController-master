@@ -44,7 +44,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Autonomous(name = "Final_Autonomous", group = "Camera")
+@Autonomous(name = "Final_Autonomouss", group = "Camera")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
@@ -159,7 +159,8 @@ public class Final extends LinearOpMode
         leftBack.setPower(0.25);
         rightBack.setPower(0.25);
         while(leftBack.isBusy() && rightBack.isBusy()) {
-
+            telemetry.addData("Left", leftBack.getCurrentPosition());
+            telemetry.update();
         }
         leftBack.setPower(0);
         rightBack.setPower(0);
