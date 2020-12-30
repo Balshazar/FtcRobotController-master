@@ -160,6 +160,7 @@ public class Final extends LinearOpMode
         rightBack.setPower(0.25);
         while(leftBack.isBusy() && rightBack.isBusy()) {
             telemetry.addData("Left", leftBack.getCurrentPosition());
+            telemetry.addData("Right", rightBack.getCurrentPosition());
             telemetry.update();
         }
         leftBack.setPower(0);
