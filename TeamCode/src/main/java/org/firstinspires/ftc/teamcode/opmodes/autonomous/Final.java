@@ -139,7 +139,7 @@ public class Final extends LinearOpMode
 
         leftBack.setTargetPosition(-500);
         rightBack.setTargetPosition(-500);
-
+        //negative
         //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
         right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
         //Right motor reversed
