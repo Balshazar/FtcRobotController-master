@@ -168,7 +168,7 @@ public class Final extends LinearOpMode
         telemetry.addData("Status", "Done");
         telemetry.update();
 
-        //Reset elapsed time
+        //Reset elapsed times
         sleep(10000);
         runtime.reset();
         //move(120);
