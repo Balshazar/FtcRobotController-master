@@ -67,7 +67,7 @@ public class masterTeleOp extends LinearOpMode {
     //Rear right motor
     private DcMotor rightBack = null;
     //Intake Left
-    private DcMotor left_intake = null;
+    //private DcMotor left_intake = null;
     //Intake Right
     private DcMotor right_intake = null;
     //Unused motors
@@ -88,11 +88,11 @@ public class masterTeleOp extends LinearOpMode {
         //Set the right back motor to reverse
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
-        left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
+        //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
         right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
         //Right motor reversed
 
-        left_intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //left_intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right_intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -142,15 +142,7 @@ public class masterTeleOp extends LinearOpMode {
 
             }
 
-            if (gamepad1.left_trigger >= 0.0) {
-                left_intake.setPower(20);
 
-
-            }
-            else {
-                left_intake.setPower(0);
-
-            }
             if (gamepad1.y == true) {
 
                 servoone.setPosition(0.75);

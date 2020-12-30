@@ -18,8 +18,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.firstinspires.ftc.teamcode.opmodes.autonomous;
 
-package org.firstinspires.ftc.teamcode.opmodes.teleop;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -36,11 +44,57 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@TeleOp
-public class EasyOpenCVExample extends LinearOpMode
+@Autonomous(name = "Final_Autonomous", group = "Camera")
+/*
+_________________________________
+|   Name   | Port | Name on Hub |
+|----------|------|-------------|
+|Left Back |  1   | "left back" |
+|----------|------|-------------|
+|Right Back|  3   | "right back"|
+|_______________________________|
+
+  _____     _____                                      _______      ______
+ /____ /]  /____/                       _____         /______/\    /_____/
+ [    ] ] /    /          __           /____/ [        \     \ \  /     /             __                     ______
+ [    ] ]/    /          /\ \          [    [ [         \     \ \/     /             /\ \                   /       \
+ [    ] /    /          /  \ \         [    [ [          \     \/     /             /  \ \                  |       |
+ [          /\         /  _ \ \        [    [ [           \          /             /  _ \ \                  \     /
+ [    ]\    \ \       /  /_\ \ \       [    [ [____        \        /[            /  /_\ \ \                  \   /
+ [    ] \    \ \     /  ____  \ \      [    [/____/[        [      [ [           /  ____  \ \                  \_/
+ [    ]] \    \ \   /  / /  \  \ \     [         [ /        [      [ /          /  / /  \  \ \                  _
+ [____]/  \____\/  /__/_/    \__\_\    [_________[/         [______[/          /__/_/    \__\_\   is the best  (_)
+
+ */
+public class Final extends LinearOpMode
 {
+    // Declare OpMode members.
+    //Elapsed time variable
+    private ElapsedTime runtime = new ElapsedTime();
+    //Rear left motor
+    private DcMotor leftBack = null;
+    //Rear right motor
+    private DcMotor rightBack = null;
+    //Intake Left
+    //private DcMotor left_intake = null;
+    //Intake Right
+    private DcMotor right_intake = null;
+    //Unused motors
+    private DcMotor rightFront = null;
+    private DcMotor leftFront = null;
+    private Servo servoone = null;
+    private Servo servotwo = null;
+    private int intake_num = 0;
     OpenCvInternalCamera phoneCam;
     SkystoneDeterminationPipeline pipeline;
+    public void move(int secs) {
+        rightBack.setPower(0.70);
+        leftBack.setPower(-0.70);
+        sleep(secs);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+    }
+
 
     @Override
     public void runOpMode()
@@ -64,22 +118,72 @@ public class EasyOpenCVExample extends LinearOpMode
                 phoneCam.startStreaming(320,240, OpenCvCameraRotation.SIDEWAYS_LEFT);
             }
         });
+        //Print stuff to Driver Station phone
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        leftBack  = hardwareMap.get(DcMotor.class, "Left Back");
+        rightBack = hardwareMap.get(DcMotor.class, "Right Back");
+        //Set the right back motor to reverse
+        rightBack.setDirection(DcMotor.Direction.REVERSE);
 
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftBack.setTargetPosition(500);
+        rightBack.setTargetPosition(500);
+
+        //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
+        right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
+        //Right motor reversed
+        right_intake.setDirection(DcMotor.Direction.REVERSE);
+        servoone = hardwareMap.servo.get("servoone");
+        servotwo = hardwareMap.servo.get("servotwo");
+
+
+        //Wait for start
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            if (pipeline.position.equals("FOUR")) {
-                telemetry.addData("Position", pipeline.position);
+        leftBack.setPower(0.25);
+        rightBack.setPower(0.25);
+        while(rightBack.isBusy() && leftBack.isBusy()) {
+            //Loop body can be empty
 
-            }
-
-            telemetry.update();
-
-            // Don't burn CPU cycles busy-looping in this sample
-            sleep(50);
         }
+        leftBack.setPower(0);
+        rightBack.setPower(0);
+        telemetry.addData("Status", "Done");
+        telemetry.update();
+
+        //Reset elapsed time
+        sleep(10000);
+        runtime.reset();
+        //move(120);
+
+
+
+
+
+        //telemetry.addData("Position", pipeline.position);
+
+        //telemetry.addData("num", SkystoneDeterminationPipeline.avg1);
+
+
+
+
+
+        //telemetry.update();
+        //sleep(50);
+
+
+
+
     }
 
     public static class SkystoneDeterminationPipeline extends OpenCvPipeline
@@ -108,8 +212,8 @@ public class EasyOpenCVExample extends LinearOpMode
         static final int REGION_WIDTH = 35;
         static final int REGION_HEIGHT = 25;
 
-        final int FOUR_RING_THRESHOLD = 150;
-        final int ONE_RING_THRESHOLD = 135;
+        final int FOUR_RING_THRESHOLD = 170;
+        final int ONE_RING_THRESHOLD = 150;
 
         Point region1_pointA = new Point(
                 REGION1_TOPLEFT_ANCHOR_POINT.x,
@@ -124,7 +228,7 @@ public class EasyOpenCVExample extends LinearOpMode
         Mat region1_Cb;
         Mat YCrCb = new Mat();
         Mat Cb = new Mat();
-        int avg1;
+        static int avg1;
 
         // Volatile since accessed by OpMode thread w/o synchronization
         private volatile RingPosition position = RingPosition.FOUR;
@@ -162,6 +266,7 @@ public class EasyOpenCVExample extends LinearOpMode
                     2); // Thickness of the rectangle lines
 
             position = RingPosition.FOUR; // Record our analysis
+
             if(avg1 > FOUR_RING_THRESHOLD){
                 position = RingPosition.FOUR;
             }else if (avg1 > ONE_RING_THRESHOLD){
@@ -184,5 +289,7 @@ public class EasyOpenCVExample extends LinearOpMode
         {
             return avg1;
         }
+
+
     }
 }

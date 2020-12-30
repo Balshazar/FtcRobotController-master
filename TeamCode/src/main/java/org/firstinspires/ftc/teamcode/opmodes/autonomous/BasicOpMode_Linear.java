@@ -68,7 +68,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
     //Rear right motor
     private DcMotor rightBack = null;
     //Intake Left
-    private DcMotor left_intake = null;
+    //private DcMotor left_intake = null;
     //Intake Right
     private DcMotor right_intake = null;
     //Unused motors
@@ -96,7 +96,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
         //Set the right back motor to reverse
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
-        left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
+        //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
         right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
         //Right motor reversed
         right_intake.setDirection(DcMotor.Direction.REVERSE);
@@ -109,13 +109,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
         //Reset elapsed time
         runtime.reset();
         move(120);
-        right_intake.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_intake.setTargetPosition(111);
-        right_intake.setPower(1);
-        right_intake.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while(right_intake.isBusy()) {
 
-        }
 
 
 
