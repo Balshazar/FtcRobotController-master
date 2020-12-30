@@ -124,17 +124,21 @@ public class Final extends LinearOpMode
         leftBack  = hardwareMap.get(DcMotor.class, "Left Back");
         rightBack = hardwareMap.get(DcMotor.class, "Right Back");
         //Set the right back motor to reverse
-        rightBack.setDirection(DcMotor.Direction.REVERSE);
+
 
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftBack.setTargetPosition(500);
-        rightBack.setTargetPosition(500);
+        leftBack.setTargetPosition(-500);
+        rightBack.setTargetPosition(-500);
 
         //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
         right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
@@ -152,8 +156,7 @@ public class Final extends LinearOpMode
 
         leftBack.setPower(0.25);
         rightBack.setPower(0.25);
-        while(rightBack.isBusy() && leftBack.isBusy()) {
-            //Loop body can be empty
+        while(leftBack.isBusy() && rightBack.isBusy()) {
 
         }
         leftBack.setPower(0);
