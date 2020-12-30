@@ -44,7 +44,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Autonomous(name = "Final_Autonomous", group = "Camera")
+@Autonomous(name = "Final_Autonomouss", group = "Camera")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
@@ -137,8 +137,7 @@ public class Final extends LinearOpMode
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftBack.setTargetPosition(-500);
-        rightBack.setTargetPosition(-500);
+
         //negative
         //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
         right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
@@ -153,6 +152,9 @@ public class Final extends LinearOpMode
 
         leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftBack.setTargetPosition(-500);
+        rightBack.setTargetPosition(-500);
 
         leftBack.setPower(0.25);
         rightBack.setPower(0.25);
