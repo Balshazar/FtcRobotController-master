@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -44,7 +45,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-@Autonomous(name = "Final_Autonomouss", group = "Camera")
+@Autonomous(name = "Final_Autonomous", group = "Camera")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
@@ -85,14 +86,92 @@ public class Final extends LinearOpMode
     private Servo servoone = null;
     private Servo servotwo = null;
     private int intake_num = 0;
+    private int square = 0;
     OpenCvInternalCamera phoneCam;
     SkystoneDeterminationPipeline pipeline;
-    public void move(int secs) {
-        rightBack.setPower(0.70);
-        leftBack.setPower(-0.70);
-        sleep(secs);
-        rightBack.setPower(0);
-        leftBack.setPower(0);
+    public void goToSquare(int field_square) {
+        if (field_square == 1) {
+            move(-700, 700);
+            move(700, 700);
+            move(800, -800);
+            move(1000, 1000);
+        }
+        if (field_square == 2) {
+            move(200, 300);
+            move(500, 500);
+            move(300, 200);
+            move(700, 700);
+
+        }
+        if (field_square == 3) {
+            move(200, 300);
+            move(500, 500);
+            move(300, 200);
+            move(700, 700);
+
+        }
+    }
+    public void move(int rotations_left, int rotations_right) {
+
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rotations_left = rotations_left * -1;
+        rotations_right = rotations_right * -1;
+        if (rotations_left <= 0) {
+            leftBack.setPower(-0.25);
+        }
+        else {
+            leftBack.setPower(0.25);
+        }
+
+        if (rotations_right <= 0) {
+            rightBack.setPower(0.25);
+        }
+        else {
+            rightBack.setPower(-0.25);
+        }
+
+
+
+        while (true) {
+            telemetry.addData("Left", leftBack.getCurrentPosition());
+            telemetry.addData("Right", rightBack.getCurrentPosition());
+            telemetry.update();
+            if (rotations_left <= 0) {
+                if (leftBack.getCurrentPosition() <= rotations_left) {
+                    leftBack.setPower(0);
+                }
+
+            }
+            else {
+                if (leftBack.getCurrentPosition() >= rotations_left) {
+                    leftBack.setPower(0);
+                }
+
+            }
+
+            if (rotations_right <= 0) {
+                if (rightBack.getCurrentPosition() <= rotations_right) {
+                    rightBack.setPower(0);
+                }
+
+            }
+            else {
+                if (rightBack.getCurrentPosition() >= rotations_right) {
+                    rightBack.setPower(0);
+                }
+            }
+
+
+            if (leftBack.getPower() == 0.0 && rightBack.getPower() == 0.0) {
+                break;
+            }
+        }
+
     }
 
 
@@ -123,19 +202,15 @@ public class Final extends LinearOpMode
         telemetry.update();
         leftBack  = hardwareMap.get(DcMotor.class, "Left Back");
         rightBack = hardwareMap.get(DcMotor.class, "Right Back");
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
         //Set the right back motor to reverse
 
 
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
 
         //negative
@@ -149,28 +224,36 @@ public class Final extends LinearOpMode
 
         //Wait for start
         waitForStart();
-        leftBack.setTargetPosition(-500);
-        rightBack.setTargetPosition(500);
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        runtime.reset();
 
 
 
-        leftBack.setPower(0.25);
-        rightBack.setPower(0.25);
-        while(leftBack.isBusy() && rightBack.isBusy()) {
-            telemetry.addData("Left", leftBack.getCurrentPosition());
-            telemetry.addData("Right", rightBack.getCurrentPosition());
-            telemetry.update();
+
+
+        move(1500, 15);
+        sleep(1000000);
+        //get ring height and but that in square
+        /*telemetry.addData("Position", pipeline.position);
+        telemetry.addData("num", SkystoneDeterminationPipeline.avg1);
+        if (pipeline.position.equals("None")) {
+            square = 1;
         }
-        leftBack.setPower(0);
-        rightBack.setPower(0);
+
+        if (pipeline.position.equals("One")) {
+            square = 2;
+        }
+        if (pipeline.position.equals("Four")) {
+            square = 3;
+        } */
+        telemetry.addData("Status", square);
+        telemetry.update();
+        goToSquare(1);
         telemetry.addData("Status", "Done");
         telemetry.update();
 
         //Reset elapsed times
         sleep(10000);
-        runtime.reset();
+
         //move(120);
 
 
