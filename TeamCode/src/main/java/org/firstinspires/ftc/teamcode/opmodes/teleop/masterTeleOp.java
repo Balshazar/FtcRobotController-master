@@ -69,14 +69,64 @@ public class masterTeleOp extends LinearOpMode {
     //Intake Left
     //private DcMotor left_intake = null;
     //Intake Right
-    private DcMotor right_intake = null;
+    private DcMotor arm_motor = null;
     //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
     private Servo servoone = null;
     private Servo servotwo = null;
     private int intake_num = 0;
+    private float up_down = 20;
+    private int closed_int = 0;
+    private boolean closed = true;
+    private int arm_boolean = 3;
+    public void move(int arm_rotations) {
 
+        arm_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        arm_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        arm_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        arm_rotations = arm_rotations * -1;
+
+        if (arm_rotations <= 0) {
+            arm_motor.setPower(-0.80);
+        } else {
+            arm_motor.setPower(0.80);
+        }
+
+
+
+
+        while (true) {
+            telemetry.addData("Arm Rotations", arm_rotations);
+            telemetry.addData("arm_motor", arm_motor.getCurrentPosition());
+            telemetry.update();
+            arm_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            if (arm_rotations >= 0) {
+                if (arm_motor.getCurrentPosition() >= arm_rotations) {
+                    arm_motor.setPower(0);
+
+                }
+
+            } else {
+                if (arm_motor.getCurrentPosition() <= arm_rotations) {
+                    arm_motor.setPower(0);
+
+                }
+
+            }
+
+
+
+
+            if (arm_motor.getPower() == 0.0) {
+                break;
+            }
+        }
+
+    }
     @Override
     public void runOpMode() {
 
@@ -89,14 +139,14 @@ public class masterTeleOp extends LinearOpMode {
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
         //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
-        right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
+        arm_motor = hardwareMap.get(DcMotor.class, "Arm Motor");
         //Right motor reversed
 
         //left_intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right_intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right_intake.setDirection(DcMotor.Direction.REVERSE);
+        arm_motor.setDirection(DcMotor.Direction.REVERSE);
 
         servoone = hardwareMap.servo.get("servoone");
         servotwo = hardwareMap.servo.get("servotwo");
@@ -107,6 +157,7 @@ public class masterTeleOp extends LinearOpMode {
         //Reset elapsed time
         runtime.reset();
         servoone.setPosition(0.5);
+
         while (opModeIsActive()) {
 
             //power to rear back motor
@@ -133,33 +184,53 @@ public class masterTeleOp extends LinearOpMode {
             leftBack.setPower(leftPower);
             rightBack.setPower(rightPower);
 
-            if (gamepad1.right_trigger == 1) {
-                right_intake.setPower(-1);
+
+
+            if (gamepad1.dpad_up && arm_boolean == 3) {
+                move(150);
+                arm_boolean = 0;
+
 
             }
-            else {
-                right_intake.setPower(0);
+            if (gamepad1.dpad_down && arm_boolean == 2) {
+                move(-100);
+                arm_boolean = 1;
+
+            }
+            if (arm_boolean == 0 && gamepad1.dpad_up == false) {
+                arm_boolean = 2;
+
+            }
+            if (arm_boolean == 1 && gamepad1.dpad_down == false) {
+                arm_boolean = 3;
 
             }
 
+            if (arm_boolean == 0 || arm_boolean == 2) {
+                if (arm_motor.getCurrentPosition() - 5 >= -145 && arm_motor.getCurrentPosition() + 5 <= -155) {
+                    move((-150 - arm_motor.getCurrentPosition()) * -1);
+                }
+            }
 
-            if (gamepad1.y == true) {
+            if (gamepad1.left_trigger > 0.0 && closed == false && closed_int == 0) {
+                closed_int = 1;
+                closed = true;
+                servoone.setPosition(-0.25);
 
-                servoone.setPosition(0.75);
-                servotwo.setPosition(0.75);
+
 
             }
-            if (gamepad1.x == true) {
-
-                servoone.setPosition(0.50);
-                servotwo.setPosition(0.50);
-
-            }
-            if (gamepad1.a == true) {
-
+            else if (gamepad1.left_trigger > 0.0 && closed == true && closed_int == 0) {
+                closed_int = 1;
+                closed = false;
                 servoone.setPosition(0.25);
-                servotwo.setPosition(0.25);
 
+
+
+            }
+           
+            if (gamepad1.left_trigger == 0.0 && closed_int == 1) {
+                closed_int = 0;
             }
 
 
@@ -168,10 +239,7 @@ public class masterTeleOp extends LinearOpMode {
 
 
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "Dpad", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            telemetry.update();
+
 
         }
     }

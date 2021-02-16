@@ -19,58 +19,31 @@
  * SOFTWARE.
  */
 package org.firstinspires.ftc.teamcode.opmodes.autonomous;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import java.util.List;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-
-
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvPipeline;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-
-import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import java.util.Locale;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
 
 
-@Autonomous(name = "Final_Autonomous", group = "Camera")
+@Autonomous(name = "Tester", group = "Camera")
 /*
 _________________________________
 |   Name   | Port | Name on Hub |
@@ -92,7 +65,7 @@ _________________________________
  [____]/  \____\/  /__/_/    \__\_\    [_________[/         [______[/          /__/_/    \__\_\   is the best  (_)
 
  */
-public class Final extends LinearOpMode {
+public class Tester extends LinearOpMode {
     // Declare OpMode members.
     //Elapsed time variable
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
@@ -120,7 +93,7 @@ public class Final extends LinearOpMode {
     //Intake Left
     //private DcMotor left_intake = null;
     //Intake Right
-
+    private DcMotor right_intake = null;
     //Unused motors
     private DcMotor rightFront = null;
     private DcMotor leftFront = null;
@@ -161,53 +134,24 @@ public class Final extends LinearOpMode {
         }
     }
 
-
-
-    //Notes about angles:
-        /*
-        1st square:
-        -46
-        1500
-        3
-
-        2nd square:
-        -13
-
-        3rd square:
-        -25
-        -132
-        159
-        0
-
-         */
     public void goToSquare(int field_square) {
         if (field_square == 1) {
             turn(-48, 0.30, -0.30);
             move(2000, 2000);
             move(-800, -800);
             turn(3, -0.30, 0.30);
-            move(200, 200);
-            //end
+            move(400, 400);
         }
         if (field_square == 2) {
             turn(-13, 0.30, -0.30);
             move(2400, 2400);
-            move(-1300, -1300);
-            //end
+            move(-1000, -1000);
 
         }
         if (field_square == 3) {
             turn(-22, 0.30, -0.30);
             move(3700, 3700);
-            move(-2300, -2300);
-            //end
-            /*turn(-132, 0.30, -0.30);
-            move(1300, 1300);
-            turn(160, 0.30, -0.30);
-            move(800, 800);
-            turn(0, 0.30, -0.30);
-            move(5000, 5000);*/
-
+            move(-2000, -2000);
         }
     }
 
@@ -292,9 +236,11 @@ public class Final extends LinearOpMode {
         imu.initialize(parameters);
 
 
+        // We set the viewport policy to optimized view so the preview doesn't appear 90 deg
+        // out when the RC activity is in portrait. We do our actual image processing assuming
+        // landscape orientation, though.
 
-
-
+        //Print stuff to Driver Station phone
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         leftBack = hardwareMap.get(DcMotor.class, "Left Back");
@@ -302,19 +248,19 @@ public class Final extends LinearOpMode {
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        servotwo = hardwareMap.servo.get("servotwo");
         //Set the right back motor to reverse
 
 
         //negative
         //left_intake  = hardwareMap.get(DcMotor.class, "Left Intake");
-
+        right_intake = hardwareMap.get(DcMotor.class, "Right Intake");
+        //Right motor reversed
+        right_intake.setDirection(DcMotor.Direction.REVERSE);
         servoone = hardwareMap.servo.get("servoone");
         servotwo = hardwareMap.servo.get("servotwo");
 
 
         //Wait for start
-        servotwo.setPosition(0.90);
         waitForStart();
         runtime.reset();
 
@@ -325,7 +271,7 @@ public class Final extends LinearOpMode {
 
         //get ring height and but that in square
 
-        while (counter <= 20) {
+        while (opModeIsActive()) {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -336,9 +282,11 @@ public class Final extends LinearOpMode {
                     // step through the list of recognitions and display boundary info.
                     int i = 0;
                     counter += 1;
-
+                    telemetry.addData("Cooooool", (int) updatedRecognitions.size());
+                    telemetry.update();
                     if ((int) updatedRecognitions.size() == 0) {
-
+                        telemetry.addData("Cooooool", square);
+                        telemetry.update();
                         square = 1;
 
                     }
@@ -371,6 +319,27 @@ public class Final extends LinearOpMode {
 
         turn(31, -0.30, 0.30);
         move(700, 700);
+        /*while (opModeIsActive()) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            telemetry.addData("Angle", (int) angles.firstAngle);
+            telemetry.update();
+        } */
+
+
+        //Notes about angles:
+        /*
+        1st square:
+        -46
+        1500
+        3
+
+        2nd square:
+        -13
+
+        3rd square:
+        -25
+
+         */
 
         telemetry.addData("Status", square);
         telemetry.update();
@@ -381,8 +350,19 @@ public class Final extends LinearOpMode {
         telemetry.addData("Status", "Done");
         telemetry.update();
 
+        //Reset elapsed times
 
 
+        //move(120);
+
+
+        //telemetry.addData("Position", pipeline.position);
+
+        //telemetry.addData("num", SkystoneDeterminationPipeline.avg1);
+
+
+        //telemetry.update();
+        //sleep(50);
 
 
         if (tfod != null) {
